@@ -1,0 +1,21 @@
+---
+- hosts: all
+  vars:
+    repo_credentials: "{{ lookup('env','REPO_CREDENTIALS') }}"
+    cloudhealth_url: "https://s3.amazonaws.com/remote-collector/agent/v19/install_cht_perfmon.sh"
+  tasks:
+  - name: install wget
+    become: yes
+    yum:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+      - wget
+  - name: download Cloudhealth agent
+    get_url:
+      url: "{{ cloudhealth_url }}"
+      dest: /tmp/install_cht_perfmon.sh
+      mode: a+rx
+  - name: install cloudhealth agent
+    become: yes
+    command: /tmp/install_cht_perfmon.sh 19 00cf1d92-1b9f-4e3f-930b-a5d38bbe1534 aws

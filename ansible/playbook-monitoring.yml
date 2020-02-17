@@ -1,0 +1,14 @@
+---
+- hosts: all
+  vars:
+    repo_credentials: "{{ lookup('env','REPO_CREDENTIALS') }}"
+    dynatrace_url: "http://{{ repo_credentials }}@{{ lookup('env','DYNATRACE_SUFFIX') }}"
+  tasks:
+  - name: download Dynatrace agent
+    get_url:
+      url: "{{ dynatrace_url }}"
+      dest: /tmp/Dynatrace-OneAgent-Linux.sh
+      mode: a+rx
+  - name: run dynatrace agent
+    become: yes
+    command: /tmp/Dynatrace-OneAgent-Linux.sh APP_LOG_CONTENT_ACCESS=1

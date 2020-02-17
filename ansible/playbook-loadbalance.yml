@@ -1,0 +1,37 @@
+---
+- hosts: Balancer
+  vars:
+    workspace: "{{ lookup('env','WORKSPACE') }}"
+    repo_credentials: "{{ lookup('env','REPO_CREDENTIALS') }}"
+    gobetween_url: "http://{{ repo_credentials }}@{{ lookup('env','GOBETWEEN_SUFFIX') }}"
+  tasks:
+  - name: download gobetween binary
+    get_url:
+      url: "{{ gobetween_url }}"
+      dest: /home/cliqruser/gobetween
+      owner: cliqruser
+      group: cliqruser
+      mode: a+rx
+  - name: push gobetween config
+    become: yes
+    copy:
+      remote_src: no
+      src: "{{ workspace }}/gobetween/gobetween.toml"
+      dest: /home/cliqruser/gobetween.toml
+      owner: cliqruser
+      group: cliqruser
+      mode: a+r
+  - name: push gobetween.service
+    become: yes
+    copy:
+      remote_src: no
+      src: "{{ workspace }}/gobetween/gobetween.service"
+      dest: /lib/systemd/system/gobetween.service
+      mode: a+r
+  - name: restart gobetween service
+    become: yes
+    systemd:
+      name: gobetween.service
+      enabled: yes
+      state: restarted
+      daemon_reload: yes

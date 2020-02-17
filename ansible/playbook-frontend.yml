@@ -1,0 +1,52 @@
+---
+- hosts: App
+  vars:
+    workspace: "{{ lookup('env','WORKSPACE') }}"
+    repo_credentials: "{{ lookup('env','REPO_CREDENTIALS') }}"
+    tomcat_url: "http://{{ repo_credentials }}@{{ lookup('env','TOMCAT_SUFFIX') }}"
+  tasks:
+  - name: install Java
+    become: yes
+    yum:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+      - epel-release
+      - java-1.8.0-openjdk
+  - name: download tomcat
+    get_url:
+      url: "{{ tomcat_url }}"
+      dest: /tmp/apache-tomcat-7.0.86.tar.gz
+      mode: a+r
+  - name: untar tomcat
+    become: yes
+    unarchive:
+      src: /tmp/apache-tomcat-7.0.86.tar.gz
+      dest: /opt
+      remote_src: yes
+  - name: upload java webapp
+    become: yes
+    synchronize:
+      src: "{{ item }}"
+      dest: /opt/apache-tomcat-7.0.86/webapps/ROOT
+      verify_host: no 
+      recursive: yes
+      delete: yes
+      rsync_opts: --rsh "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no -l cliqruser -i {{ workspace }}/keyfile"
+    with_items:
+      - "{{ workspace }}/uol/ecommerce/"
+      - "{{ workspace }}/uol/WEB-INF"
+  - name: copy tomcat.service
+    become: yes
+    copy:
+      remote_src: no
+      src: "{{ workspace }}/tomcat/tomcat.service"
+      dest: /lib/systemd/system/tomcat.service
+      mode: a+x
+  - name: restart tomcat service
+    become: yes
+    systemd:
+      name: tomcat.service
+      enabled: yes
+      state: restarted
+      daemon_reload: yes

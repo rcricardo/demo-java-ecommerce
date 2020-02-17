@@ -1,0 +1,9 @@
+[Unit]
+Description=Gobetween Load Balancer Service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/cliqruser
+ExecStart=/home/cliqruser/gobetween -c /home/cliqruser/gobetween.toml
+Restart=on-failure

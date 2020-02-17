@@ -1,0 +1,16 @@
+[Unit]
+Description=Apache Tomcat Service
+After=network.target
+
+[Service]
+Type=forking
+User=root
+WorkingDirectory=/home/cliqruser
+Environment="CATALINA_PID=/opt/apache-tomcat-7.0.86/logs/catalina.pid"
+PIDFile=$CATALINA_PID
+ExecStart=/opt/apache-tomcat-7.0.86/bin/startup.sh
+ExecStop=/opt/apache-tomcat-7.0.86/bin/shutdown.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

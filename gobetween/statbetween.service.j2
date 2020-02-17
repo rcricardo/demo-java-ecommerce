@@ -1,0 +1,14 @@
+[Unit]
+Description=Aggregate Stats for Gobetween Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/cliqruser
+Environment="GOBETWEEN_HOSTS={{ loadbalancer_hosts }}"
+ExecStart=/home/cliqruser/statbetween
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
