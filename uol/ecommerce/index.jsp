@@ -29,7 +29,7 @@
 
     		<div class="topbar">
     			<span class="topbar-child1">
-    				website version: #02 || hostname: <%= java.net.InetAddress.getLocalHost().getHostName() %>
+    				website version: #03 || hostname: <%= java.net.InetAddress.getLocalHost().getHostName() %>
     			</span>
     		</div>
 
